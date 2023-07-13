@@ -15,6 +15,8 @@ from .forms import ModuleFormSet
 from .models import Course
 from .models import Module, Content
 from .models import Subject
+from django.core.cache import cache
+
 
 
 class ManageCourseListView(ListView):
@@ -197,8 +199,11 @@ class CourseListView(TemplateResponseMixin, View):
     def get(self, request, subject=None):
         subjects = cache.get('all_subjects')
         if not subjects:
-            subjects = Subject.objects.annotate(
-                            total_courses=Count('courses'))
+            subjects = cache.get('all_subjects')
+            if not subjects:
+                subjects = Subject.objects.annotate(total_courses=Count('courses'))
+            # subjects = Subject.objects.annotate(
+            #                 total_courses=Count('courses'))
             cache.set('all_subjects', subjects)
         all_courses = Course.objects.annotate(
                         total_modules=Count('modules'))
