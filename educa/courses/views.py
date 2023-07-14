@@ -199,14 +199,9 @@ class CourseListView(TemplateResponseMixin, View):
     def get(self, request, subject=None):
         subjects = cache.get('all_subjects')
         if not subjects:
-            subjects = cache.get('all_subjects')
-            if not subjects:
-                subjects = Subject.objects.annotate(total_courses=Count('courses'))
-            # subjects = Subject.objects.annotate(
-            #                 total_courses=Count('courses'))
+            subjects = Subject.objects.annotate(total_courses=Count('courses'))
             cache.set('all_subjects', subjects)
-        all_courses = Course.objects.annotate(
-                        total_modules=Count('modules'))
+        all_courses = Course.objects.annotate(total_modules=Count('modules'))
         if subject:
             subject = get_object_or_404(Subject, slug=subject)
             key = f'subject_{subject.id}_courses'
@@ -222,6 +217,7 @@ class CourseListView(TemplateResponseMixin, View):
         return self.render_to_response({'subjects': subjects,
                                         'subject': subject,
                                         'courses': courses})
+
 
 
 class CourseDetailView(DetailView):
